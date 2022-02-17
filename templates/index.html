@@ -7,8 +7,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
         <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
         <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
-        <!-- <link rel="stylesheet" href="styles/css/fontawesome.min.css"> -->
         <style>
             body {
                 background-color: #c7b39b; /* Цвет фона */
@@ -27,7 +27,8 @@
                 justify-content: center;
             }
         </style>
-        <script>            
+        <script type="text/javascript">            
+            const ApiEnpointLogin = '/login'
             $(document).ready(async function() {
                 "use strict";
                 const username_inp = $('input[id="username_inp"]');
@@ -43,16 +44,27 @@
                             setTimeout(() => elem.setAttribute('style', ''), 500);
                             return;
                         }
-                    }
+                    }                   
+                    let pwd_hash = CryptoJS.SHA256(password_inp.val().trim()).toString(CryptoJS.enc.Base64);                    
+                    login({username: username_inp.val().trim(),
+                           password: pwd_hash})
                 });
             });
+
+            async function login(user_data){
+                return await fetch(ApiEnpointLogin, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json;charset=utf-8'},
+                    body: JSON.stringify(user_data)
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    console.log(data);  
+                });
+            }
         </script>
     </head>
     <body>
-        <!-- <div class="container-fluid">
-            <h1>My First Bootstrap Page</h1>
-            <p>This is some text.</p>
-        </div> -->
         <div class="container-fluid">
             <div>&nbsp;</div>
             <div class="row">
