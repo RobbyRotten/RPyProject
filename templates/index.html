@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
+        <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
+        <!-- <link rel="stylesheet" href="styles/css/fontawesome.min.css"> -->
+        <style>
+            body {
+                background-color: #c7b39b; /* Цвет фона */
+            }
+            div.container-fluid{
+                background-color: white;
+                width: 30%;
+                height: 25%;
+                vertical-align: middle;
+                margin-top: 5%;
+                border-radius: 5px;
+                box-shadow: 0px 0px 10px black;;
+            }
+            div.col-sm-12{
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+        <script>            
+            $(document).ready(async function() {
+                "use strict";
+                const username_inp = $('input[id="username_inp"]');
+                const password_inp = $('input[id="password_inp"]');
+                const user_data_inp = $('input[name="user_data_inp"]');
+                const login_btn = $('button[id="login_btn"]');
+
+                login_btn.on('click', async function(){
+                    console.log('login_btn');
+                    for (let elem of user_data_inp){
+                        if (elem.value === ''){
+                            elem.setAttribute('style', 'border: 2px solid red;');
+                            setTimeout(() => elem.setAttribute('style', ''), 500);
+                            return;
+                        }
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <!-- <div class="container-fluid">
+            <h1>My First Bootstrap Page</h1>
+            <p>This is some text.</p>
+        </div> -->
+        <div class="container-fluid">
+            <div>&nbsp;</div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <i class="fa fa-user-circle fa-8x"></i>
+                </div>
+            </div>
+            <div>&nbsp;</div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <label for="username_inp">Enter username:&nbsp;</label>
+                </div>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="username_inp" name="user_data_inp">
+                </div>                
+            </div>
+            <div>&nbsp;</div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <label for="password_inp">Enter password:&nbsp;</label>
+                </div>
+                <div class="col-sm-6">
+                    <input type="password" class="form-control" id="password_inp" name="user_data_inp">
+                </div>                 
+            </div>
+            <div>&nbsp;</div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button class="btn btn-primary" id="login_btn">
+                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Log in
+                    </button>        
+                </div>   
+            </div>
+            <div>&nbsp;</div>
+        </div>
+    </body>
+</html>    
