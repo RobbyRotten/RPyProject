@@ -28,11 +28,12 @@
             }
         </style>
         <script type="text/javascript">            
-            const ApiEndPointLogin = '/login';
-            const ApiEndPointMainPage = '/main_page';
+            const ApiEndPointLogin = '/login'
             $(document).ready(async function() {
                 "use strict";
-                const username_inp = $('input[id="username_inp"]');
+
+                console.log('Hello there');
+                /*const username_inp = $('input[id="username_inp"]');
                 const password_inp = $('input[id="password_inp"]');
                 const user_data_inp = $('input[name="user_data_inp"]');
                 const login_btn = $('button[id="login_btn"]');
@@ -52,10 +53,8 @@
                     console.log(resp);  
                     if (!resp.Success){
                         alert(resp.Error);
-                        return;
-                    }                       
-                    window.location.replace(ApiEndPointMainPage + '?jwt=' + resp.access_token);      
-                });
+                    }                                          
+                });*/
             });
 
             async function login(user_data){
@@ -65,13 +64,15 @@
                     body: JSON.stringify(user_data)
                 }).then(function(response) {
                     return response.json();
-                });
+                });/*.then(function(data) {
+                    console.log(data);  
+                });*/
             }
         </script>
     </head>
     <body>
-        <div class="container-fluid" id="main_card">
-            <div>&nbsp;</div>
+        <div class="container-fluid">
+            <!--<div>&nbsp;</div>
             <div class="row">
                 <div class="col-sm-12">
                     <i class="fa fa-user-circle fa-8x"></i>
@@ -103,7 +104,7 @@
                     </button>        
                 </div>   
             </div>
-            <div>&nbsp;</div>
+            <div>&nbsp;</div>-->
         </div>
     </body>
 </html>    
