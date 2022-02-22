@@ -20,7 +20,7 @@
                 vertical-align: middle;
                 margin-top: 5%;
                 border-radius: 5px;
-                box-shadow: 0px 0px 10px black;;
+                box-shadow: 0px 0px 10px black;
             }
             div.col-sm-12{
                 display: flex;
@@ -30,6 +30,7 @@
         <script type="text/javascript">            
             const ApiEndPointLogin = '/login';
             const ApiEndPointMainPage = '/main_page';
+            
             $(document).ready(async function() {
                 "use strict";
                 const username_inp = $('input[id="username_inp"]');
@@ -53,7 +54,8 @@
                     if (!resp.Success){
                         alert(resp.Error);
                         return;
-                    }                       
+                    }          
+                    localStorage.setItem("token", resp.access_token);             
                     window.location.replace(ApiEndPointMainPage + '?jwt=' + resp.access_token);      
                 });
             });

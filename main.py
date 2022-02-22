@@ -1,10 +1,11 @@
 from distutils.log import debug
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import base64
 import hashlib
+from DaemonManager import DaemonManager
 #import pathlib
-#import os
+import os
 
 users = {'madmax': 'qwerty'}
 
@@ -44,6 +45,46 @@ def login():
 @jwt_required()
 def main_page():
     return render_template('main_page.html')
+
+@app.route('/get_image/<filename>', methods=['GET'])
+@jwt_required()
+def get_image(filename):
+    path = os.path.join('daemon', 'test.jpeg')
+    return send_file(path, mimetype='image/jpeg')
+        
+@app.route('/start_camera', methods=['GET'])
+@jwt_required()
+def start_camera():
+    success = True
+    error = ''
+    data = 'OK'
+    try:
+        dm = DaemonManager()
+        if not dm.active:
+            dm.start_roll()
+    except BaseException as e:
+        success = False
+        error = str(e)
+        data = ''
+    finally:
+        return jsonify({'Success': success, 'Error': error, 'Response': data})
+
+@app.route('/stop_camera', methods=['GET'])
+@jwt_required()
+def stop_camera():
+    success = True
+    error = ''
+    data = 'OK'
+    try:
+        dm = DaemonManager()
+        if dm.active:
+            dm.stop_roll()
+    except BaseException as e:
+        success = False
+        error = str(e)
+        data = ''
+    finally:
+        return jsonify({'Success': success, 'Error': error, 'Response': data})    
 
 class CustomException(Exception):
     def __init__(self, message):

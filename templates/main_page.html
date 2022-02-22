@@ -15,70 +15,176 @@
             }
             div.container-fluid{
                 background-color: white;
-                width: 30%;
-                height: 25%;
+                width: 70%;
+                height: 75%;
                 vertical-align: middle;
                 margin-top: 5%;
                 border-radius: 5px;
-                box-shadow: 0px 0px 10px black;;
+                box-shadow: 0px 0px 10px black;
             }
             div.col-sm-12{
                 display: flex;
                 justify-content: center;
             }
+            div.col-sm-2{
+                height: 100%;
+            }
+            img{
+                width: 90%;
+                height: 70%;
+                vertical-align: middle;
+                align-self: center;
+                border-radius: 10px;
+                border: 2px solid black;
+                box-shadow: 0px 0px 10px black;
+            }
+            button{
+                width: 105%;
+                height: 100%;
+                vertical-align: middle;
+                align-self: center;
+                color: white;
+                background-color: #0bd4c7;    
+                border-radius: 15px;   
+                box-shadow: 0px 0px 10px black;         
+            }  
+            button:hover {
+                background-color: white;
+                color: #0bd4c7;
+            }  
+            button.btn-directional{
+                width: 150%;
+                height: 150%;
+            }        
         </style>
         <script type="text/javascript">            
-            const ApiEndPointLogin = '/login'
+            const ApiEndPointStartRecording = '/start_camera';
+            const ApiEndPointStopRecording = '/stop_camera';            
+            let timerId;
+
             $(document).ready(async function() {
                 "use strict";
+                const btn_start_recording = $('button[id="btn_start_recording"]');
+                const btn_stop_recording = $('button[id="btn_stop_recording"]');
 
-                console.log('Hello there');
-                /*const username_inp = $('input[id="username_inp"]');
-                const password_inp = $('input[id="password_inp"]');
-                const user_data_inp = $('input[name="user_data_inp"]');
-                const login_btn = $('button[id="login_btn"]');
+                let token = localStorage.getItem("token");                
+                //$('#image_elem')[0].src = `{{url_for('get_image', filename='test.jpeg')}}`;
+                $('#image_elem')[0].src = `/get_image/test.jpeg?jwt=${token}`;
 
-                login_btn.on('click', async function(){
-                    console.log('login_btn');
-                    for (let elem of user_data_inp){
-                        if (elem.value === ''){
-                            elem.setAttribute('style', 'border: 2px solid red;');
-                            setTimeout(() => elem.setAttribute('style', ''), 500);
-                            return;
-                        }
-                    }                   
-                    let pwd_hash = CryptoJS.SHA256(password_inp.val().trim()).toString(CryptoJS.enc.Base64);                    
-                    let resp = await login({username: username_inp.val().trim(),
-                                            password: pwd_hash});
-                    console.log(resp);  
+                btn_start_recording.on('click', async function(){
+                    console.log('btn_start_recording');
+                    timerId = setInterval(update_image, 100);
+                    let resp = await start_recording(token);
                     if (!resp.Success){
-                        alert(resp.Error);
-                    }                                          
-                });*/
+                        console.log(resp.Error);
+                    }  
+                });
+
+                btn_stop_recording.on('click', async function(){
+                    console.log('btn_stop_recording');
+                    clearInterval(timerId);
+                    let resp = await stop_recording(token);
+                    if (!resp.Success){
+                        console.log(resp.Error);
+                    }  
+                });                
             });
 
-            async function login(user_data){
-                return await fetch(ApiEndPointLogin, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json;charset=utf-8'},
-                    body: JSON.stringify(user_data)
+            async function start_recording(token){
+                "use strict";
+                return await fetch(ApiEndPointStartRecording + '?jwt=' + token, {
+                    method: 'GET',
                 }).then(function(response) {
                     return response.json();
-                });/*.then(function(data) {
-                    console.log(data);  
-                });*/
+                });
+            }
+
+            async function stop_recording(token){
+                "use strict";
+                return await fetch(ApiEndPointStopRecording + '?jwt=' + token, {
+                    method: 'GET',
+                }).then(function(response) {
+                    return response.json();
+                });
+            }       
+            
+            function update_image(){
+                "use strict";
+                let token = localStorage.getItem("token");  
+                let random = getRandomInt(1, 10000);
+                $('#image_elem')[0].src = `/get_image/test${random}.jpeg?jwt=${token}`;
+            }
+
+            function getRandomInt(min, max) {
+                "use strict";
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min)) + min; 
             }
         </script>
     </head>
     <body>
-        <div class="container-fluid">
-            <!--<div>&nbsp;</div>
+        <div class="container-fluid">            
+            <div>&nbsp;</div>
             <div class="row">
-                <div class="col-sm-12">
-                    <i class="fa fa-user-circle fa-8x"></i>
+                <div class="col-sm-9">
+                    <img class="image-elem" id="image_elem">
+                </div>   
+                <div>&nbsp;</div>             
+                <div class="col-sm-2">
+                    <div class="row align-items-start">
+                        <button id="btn_start_recording" name="control_btn">
+                            <i class="fa fa-play-circle fa-4x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div class="row align-items-start">
+                        <button id="btn_stop_recording" name="control_btn">
+                            <i class="fa fa-stop-circle fa-4x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div>&nbsp;</div>    
+                    <!-- DIRECTIONAL BUTTONS -->
+                    <div>&nbsp;</div>   
+                    <div class="row align-items-start">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <button class="btn-directional" id="btn_turn_up" name="control_btn">
+                                <i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i>
+                            </button>
+                        </div>    
+                        <div class="col-sm-4"></div>                    
+                    </div>
+                    <div>&nbsp;</div>
+                    <div class="row align-items-start">
+                        <div class="col-sm-4">
+                            <button class="btn-directional" id="btn_turn_left" name="control_btn">
+                                <i class="fa fa-arrow-circle-left fa-3x" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <button class="btn-directional" id="btn_turn_right" name="control_btn">
+                                <i class="fa fa-arrow-circle-right fa-3x" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div class="row align-items-start">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <button class="btn-directional" id="btn_turn_down" name="control_btn">
+                                <i class="fa fa-arrow-circle-down fa-3x" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm-4"></div>
+                    </div>
+                </div>
+                <div class="col-sm-1">                    
                 </div>
             </div>
             <div>&nbsp;</div>
+            <!--
             <div class="row">
                 <div class="col-sm-6">
                     <label for="username_inp">Enter username:&nbsp;</label>
