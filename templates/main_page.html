@@ -59,38 +59,49 @@
         </style>
         <script type="text/javascript">            
             const ApiEndPointStartRecording = '/start_camera';
-            const ApiEndPointStopRecording = '/stop_camera';            
+            const ApiEndPointStopRecording = '/stop_camera';      
+            const ApiEndPointIsNextReady = '/is_next_file';  
+            const ApiEndPointGetLastFile = '/get_last_file';
+
             let timerId;
+            let img_cnt = 0;   
+            let token = localStorage.getItem("token");  
 
             $(document).ready(async function() {
                 "use strict";
                 const btn_start_recording = $('button[id="btn_start_recording"]');
                 const btn_stop_recording = $('button[id="btn_stop_recording"]');
-
-                let token = localStorage.getItem("token");                
+                       
                 //$('#image_elem')[0].src = `{{url_for('get_image', filename='test.jpeg')}}`;
-                $('#image_elem')[0].src = `/get_image/test.jpeg?jwt=${token}`;
+                $('#image_elem')[0].src = `/get_image/camera_setup.jpg?jwt=${token}`;
 
                 btn_start_recording.on('click', async function(){
                     console.log('btn_start_recording');
+                    img_cnt = 0;
                     timerId = setInterval(update_image, 100);
-                    let resp = await start_recording(token);
+                    let resp = await start_recording();
                     if (!resp.Success){
                         console.log(resp.Error);
                     }  
+                    console.log(resp.Response);
+                    resp = await get_last_file();
+                    if (!resp.Success){
+                        console.log(resp.Error);
+                    } 
+                    img_cnt = resp.Response;
                 });
 
                 btn_stop_recording.on('click', async function(){
                     console.log('btn_stop_recording');
                     clearInterval(timerId);
-                    let resp = await stop_recording(token);
+                    let resp = await stop_recording();
                     if (!resp.Success){
                         console.log(resp.Error);
                     }  
                 });                
             });
 
-            async function start_recording(token){
+            async function start_recording(){
                 "use strict";
                 return await fetch(ApiEndPointStartRecording + '?jwt=' + token, {
                     method: 'GET',
@@ -99,7 +110,7 @@
                 });
             }
 
-            async function stop_recording(token){
+            async function stop_recording(){
                 "use strict";
                 return await fetch(ApiEndPointStopRecording + '?jwt=' + token, {
                     method: 'GET',
@@ -108,11 +119,37 @@
                 });
             }       
             
-            function update_image(){
+            async function update_image(){
                 "use strict";
-                let token = localStorage.getItem("token");  
-                let random = getRandomInt(1, 10000);
-                $('#image_elem')[0].src = `/get_image/test${random}.jpeg?jwt=${token}`;
+                let filename = `file${img_cnt}.jpeg`;                
+                let next_ready = await is_next_ready(filename);
+                if (next_ready){
+                    $('#image_elem')[0].src = `/get_image/${filename}?jwt=${token}`;
+                    img_cnt++;
+                }
+            }
+
+            async function is_next_ready(file){
+                "use strict";
+                let resp = await fetch(ApiEndPointIsNextReady + '/' + file, {
+                    method: 'GET',
+                }).then(function(response) {
+                    return response.json();
+                });
+                if (!resp.Success){
+                    console.log(resp.Error);
+                    return false;
+                }
+                return resp.Response;
+            }
+
+            async function get_last_file(){
+                "use strict";
+                return await fetch(ApiEndPointGetLastFile, {
+                    method: 'GET',
+                }).then(function(response) {
+                    return response.json();
+                });
             }
 
             function getRandomInt(min, max) {
@@ -184,33 +221,6 @@
                 </div>
             </div>
             <div>&nbsp;</div>
-            <!--
-            <div class="row">
-                <div class="col-sm-6">
-                    <label for="username_inp">Enter username:&nbsp;</label>
-                </div>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" id="username_inp" name="user_data_inp">
-                </div>                
-            </div>
-            <div>&nbsp;</div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <label for="password_inp">Enter password:&nbsp;</label>
-                </div>
-                <div class="col-sm-6">
-                    <input type="password" class="form-control" id="password_inp" name="user_data_inp">
-                </div>                 
-            </div>
-            <div>&nbsp;</div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <button class="btn btn-primary" id="login_btn">
-                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Log in
-                    </button>        
-                </div>   
-            </div>
-            <div>&nbsp;</div>-->
         </div>
     </body>
 </html>    

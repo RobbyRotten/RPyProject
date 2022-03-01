@@ -6,6 +6,7 @@ import hashlib
 from DaemonManager import DaemonManager
 #import pathlib
 import os
+import re
 
 users = {'madmax': 'qwerty'}
 
@@ -49,7 +50,7 @@ def main_page():
 @app.route('/get_image/<filename>', methods=['GET'])
 @jwt_required()
 def get_image(filename):
-    path = os.path.join('daemon', 'test.jpeg')
+    path = os.path.join('daemon', 'images', filename)
     return send_file(path, mimetype='image/jpeg')
         
 @app.route('/start_camera', methods=['GET'])
@@ -60,7 +61,10 @@ def start_camera():
     data = 'OK'
     try:
         dm = DaemonManager()
-        if not dm.active:
+        if not dm.isactive():
+            for file in os.listdir(os.path.join('daemon', 'images')):
+                if file.startswith('file'):
+                    os.remove(os.path.join('daemon', 'images', file))
             dm.start_roll()
     except BaseException as e:
         success = False
@@ -77,8 +81,45 @@ def stop_camera():
     data = 'OK'
     try:
         dm = DaemonManager()
-        if dm.active:
+        if dm.isactive():
             dm.stop_roll()
+    except BaseException as e:
+        success = False
+        error = str(e)
+        data = ''
+    finally:
+        return jsonify({'Success': success, 'Error': error, 'Response': data})    
+
+@app.route('/is_next_file/<filename>', methods=['GET'])
+def is_next_file(filename):
+    success = True
+    error = ''
+    data = True
+    try:
+        path = os.path.join('daemon', 'images', filename)
+        if not os.path.isfile(path):
+            data = False
+    except BaseException as e:
+        success = False
+        error = str(e)
+        data = ''
+    finally:
+        return jsonify({'Success': success, 'Error': error, 'Response': data})    
+
+@app.route('/get_last_file', methods=['GET'])
+def get_last_file():
+    success = True
+    error = ''
+    data = True
+    try:
+        files = os.listdir(os.path.join('daemon', 'images'))
+        numbers = list(map(lambda x: re.findall(r'\d', x), files))
+        max_elem = max(numbers)
+        if len(max_elem) == 0:
+            max_num = 0
+        else:
+            max_num = max_elem[0]
+        data = max_num
     except BaseException as e:
         success = False
         error = str(e)
